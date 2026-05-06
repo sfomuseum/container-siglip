@@ -10,26 +10,31 @@ from transformers import AutoProcessor, AutoModel
 import torch
 from PIL import Image
 
-os.environ["HF_HUB_OFFLINE"] = "1"
-
 parser = argparse.ArgumentParser(description="SigLIP embeddings server")
 parser.add_argument("--model_name", default="google/siglip2-so400m-patch16-naflex")
 parser.add_argument("--host", default="localhost")
 parser.add_argument("--port", type=int, default=5000)
+parser.add_argument("--local_files", default=True)
 _args = parser.parse_args()
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
-try:
-    processor = AutoProcessor.from_pretrained(_args.model_name, local_files_only=True)
-    model     = AutoModel.from_pretrained(_args.model_name, local_files_only=True).eval()
-except Exception as e:
-    # processor = AutoProcessor.from_pretrained(_args.model_name)
-    # model     = AutoModel.from_pretrained(_args.model_name).eval()
-    log.error(f"Failed to load model from cache. Ensure it was previously downloaded. Error: {e}")
-    raise
-
+if _args.local_files:
+    
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    
+    try:
+        processor = AutoProcessor.from_pretrained(_args.model_name, local_files_only=True)
+        model     = AutoModel.from_pretrained(_args.model_name, local_files_only=True).eval()
+    except Exception as e:
+        log.error(f"Failed to load model from cache. Ensure it was previously downloaded. Error: {e}")
+        raise
+    
+else:
+    processor = AutoProcessor.from_pretrained(_args.model_name)
+    mmodel     = AutoModel.from_pretrained(_args.model_name).eval()
+        
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model   = model.to(device)
 
