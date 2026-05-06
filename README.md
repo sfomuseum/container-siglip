@@ -4,9 +4,9 @@
 
 This package is little more than a Dockerfile and some tools to run inside the container it produces. The container itself is a simple Python FastAPI HTTP server to generate vector embeddings (text and image) using one of Google' SigLIP2 models. The specific model is bundled with the container itself when it is built and the server tool is configured, by default, to only use that local data.
 
-These tools have been demonstrated to work with both [Docker](#) and Apple's [container](#) framework. The goal is to produce a standalone artifact (application) which can be used to generate embeddings without having to install a bunch of additional software. While either the `docker` or the `container` application are still required they are both available with package installers from (presumably) trusted sources.
+These tools have been demonstrated to work with both [Docker](https://docker.com/) and Apple's [container](https://github.com/apple/container/) framework. The goal is to produce a standalone artifact (application) which can be used to generate embeddings without having to install a bunch of additional software.
 
-It's not quite one-click or plug-and-play but it does meaningfull reduce the steps required to set up the tooling necessary to create vector embeddings.
+While at least one of the two `docker` or `container` applications are still required they are both available with package installers from (presumably) trusted sources. It's not quite one-click or plug-and-play but it does meaningfull reduce the steps required to set up the tooling necessary to create vector embeddings.
 
 ## Apple `container`
 
@@ -50,7 +50,7 @@ INFO:     192.168.64.1:63416 - "POST /embeddings HTTP/1.1" 200 OK
 
 ### Known-knowns
 
-First of all, the `container` is still pre-1.0 so take everything with a grain of salt.
+First of all, the `container` is still pre-1.0 so take everything with a grain of salt. It also requires an Apple Silicon processor and works best under MacOS 26 or higher.
 
 Sometimes, the internal networking layer gets messed up up. The easiest thing is to simply restart `container`:
 
