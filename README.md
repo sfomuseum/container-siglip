@@ -1,5 +1,13 @@
 # container-siglip2
 
+## Motivation
+
+This package is little more than a Dockerfile and some tools to run inside the container it produces. The container itself is a simple Python FastAPI HTTP server to generate vector embeddings (text and image) using one of Google' SigLIP2 models. The specific model is bundled with the container itself when it is built.
+
+These tools have been demonstrated to work with both [Docker](#) and Apple's [container](#) framework. The goal is to produce a standalone artifact (application) which can be used to generate embeddings without having to install a bunch of additional software. While either the `docker` or the `container` application are still required they are both available with package installers from (presumably) trusted sources.
+
+It's not quite one-click or plug-and-play but it does meaningfull reduce the steps required to set up the tooling necessary to create vector embeddings.
+
 ## Apple `container`
 
 ### Building
