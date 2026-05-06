@@ -23,7 +23,10 @@ RUN useradd -m siglip
 USER siglip
 WORKDIR /home/siglip/app
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
+ARG MODEL_NAME=google/siglip2-so400m-patch16-naflex
+
+ENV MODEL_NAME=${MODEL_NAME} \
+    PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     HF_HOME=/home/siglip/app/.cache/huggingface
 
@@ -32,7 +35,8 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder --chown=siglip:siglip /app/.cache /home/siglip/app/.cache
 
 COPY bin/siglip_server.py /usr/local/bin
+COPY --chown=siglip:siglip bin/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 EXPOSE 5000
 
-ENTRYPOINT ["/usr/local/bin/python", "/usr/local/bin/siglip_server.py", "--host", "0.0.0.0"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
