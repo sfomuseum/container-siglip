@@ -52,6 +52,8 @@ INFO:     192.168.64.1:63416 - "POST /embeddings HTTP/1.1" 200 OK
 
 First of all, the `container` is still pre-1.0 so take everything with a grain of salt. It also requires an Apple Silicon processor and works best under MacOS 26 or higher.
 
+#### Networking
+
 Sometimes, the internal networking layer gets messed up up. The easiest thing is to simply restart `container`:
 
 ```
@@ -59,11 +61,54 @@ $> container system stop
 $> container system start
 ```
 
+#### Resource exhaustion
+
 For larger models (like SigLIP) you may need to start the `container builder` process with explicit memory settings to prevent resource extraction.
 
 ```
 $> container builder start --memory 16g --cpus 8
 ```
+
+#### Disk space
+
+The `container` framework uses a lot of disk space. It's not clear why but data is stored in `~/Library/Application\ Support/com.apple.container`.
+
+```
+$> du -h -d 1 ~/Library/Application\ Support/com.apple.container
+  0B	/Users/asc/Library/Application Support/com.apple.container/.build
+ 29M	/Users/asc/Library/Application Support/com.apple.container/kernels
+9.7G	/Users/asc/Library/Application Support/com.apple.container/snapshots
+6.9G	/Users/asc/Library/Application Support/com.apple.container/content
+8.0K	/Users/asc/Library/Application Support/com.apple.container/networks
+4.0K	/Users/asc/Library/Application Support/com.apple.container/apiserver
+ 35G	/Users/asc/Library/Application Support/com.apple.container/containers
+  0B	/Users/asc/Library/Application Support/com.apple.container/volumes
+4.0K	/Users/asc/Library/Application Support/com.apple.container/plugin-state
+  0B	/Users/asc/Library/Application Support/com.apple.container/builder
+ 52G	/Users/asc/Library/Application Support/com.apple.container
+```
+
+Running `container prune` will often help (but you usually need to restart `container` itself before the pruning will work).
+
+```
+$> container prune
+buildkit
+Reclaimed 37.58 GB in disk space
+```
+
+#### Saving and loading images
+
+It is possible to save a container to a disk image. This can be useful when you want to produce a container on one machine and then copy it for use on another machine.
+
+```
+$> container image save siglip-server-so400m-patch14-384 --output siglip-server-so400m-patch14-384.img
+siglip-server-so400m-patch14-384
+
+$> du -h siglip-server-so400m-patch14-384.img
+6.8G	siglip-server-so400m-patch14-384.img
+```
+
+You would then import it using `container image save --input /path/to/image.img`.
 
 ## Docker
 
