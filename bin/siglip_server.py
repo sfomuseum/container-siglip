@@ -20,7 +20,7 @@ _args = parser.parse_args()
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
-if _args.local_files:
+if _args.local_files == True:
     
     os.environ["HF_HUB_OFFLINE"] = "1"
     

@@ -22,6 +22,17 @@ $> container build --tag siglip-server --file Dockerfile .
 $> container run --rm --memory 6G -p 127.0.0.1:5000:5000/tcp siglip-server
 ```
 
+### Known-knowns
+
+First of all, the `container` is still pre-1.0 so take everything with a grain of salt.
+
+Sometimes, the internal networking layer gets messed up up. The easiest thing is to simply restart `container`:
+
+```
+$> container system stop
+$> container system start
+```
+
 ## Docker
 
 ### Building
