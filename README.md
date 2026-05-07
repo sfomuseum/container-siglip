@@ -8,6 +8,26 @@ These tools have been demonstrated to work with both [Docker](https://docker.com
 
 While at least one of the two `docker` or `container` applications are still required they are both available with package installers from (presumably) trusted sources. It's not quite one-click or plug-and-play but it does meaningfull reduce the steps required to set up the tooling necessary to create vector embeddings.
 
+## Models
+
+This container has been tested with the following models:
+
+* google/siglip2-so400m-patch14-384
+* google/siglip2-so400m-patch16-naflex
+
+### Preparing "model context"
+
+Rather than fetching any given model from scratch every time a container is built this package assumes that there is a local copy of that model, copied from your local HuggingFace cache, in the `.cache` folder. The easiest way to configure this is to use the `prep-model-context` Makefile target with model (or "repo ID"). The Makefile target will take of ensuring the correct path and naming conventions. For example:
+
+```
+$> make prep-model-context MODEL=google/siglip2-so400m-patch14-384
+Staging model: google/siglip2-so400m-patch14-384
+mkdir -p /usr/local/sfomuseum/container-siglip/.cache/google/siglip2-so400m-patch14-384/hub
+cp -r "/Users/example/.cache/huggingface/hub/models--google--siglip2-so400m-patch14-384" /usr/local/sfomuseum/container-siglip/.cache/google/siglip2-so400m-patch14-384/hub/
+```
+
+_This assumes you have already fetched the model using the `hf download` tool._
+
 ## Apple `container`
 
 ### Building
@@ -26,7 +46,7 @@ $> container run --rm --memory 6G -p 127.0.0.1:5000:5000/tcp siglip-server
 
 ```
 $> make container MODEL=google/siglip2-so400m-patch14-384 TAG=siglip-server-so400m-patch14-384 HF_TOKEN=s33kret
-container build --build-arg MODEL_NAME=google/siglip2-so400m-patch14-384 --build-arg HF_TOKEN=s33kret --tag siglip-server-so400m-patch14-384 --file Dockerfile .
+container build --build-arg MODEL_NAME=google/siglip2-so400m-patch14-384 --tag siglip-server-so400m-patch14-384 --file Dockerfile .
 
 ...time passes
 
@@ -60,6 +80,8 @@ Sometimes, the internal networking layer gets messed up up. The easiest thing is
 $> container system stop
 $> container system start
 ```
+
+_Honestly, at this stage, restarting `container` is pretty much the easiest solution to most problems you might encounter._
 
 #### Resource exhaustion
 

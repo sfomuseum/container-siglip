@@ -32,8 +32,8 @@ torch.backends.cudnn.benchmark = True
 def _decode_image(b64: str, processor: AutoProcessor) -> torch.Tensor:
     img_bytes = base64.b64decode(b64)
     with Image.open(BytesIO(img_bytes)) as im:
-        pil = im.convert("RGB")
-    return processor(images=pil, return_tensors="pt")["pixel_values"]
+        img = im.convert("RGB")
+    return img
 
 def _normalize(vec: torch.Tensor) -> torch.Tensor:
     return vec / vec.norm(p=2, dim=-1, keepdim=True)
@@ -102,18 +102,19 @@ async def embeddings_image(payload: dict = Body(...)):
         raise HTTPException(status_code=400, detail="Missing or malformed 'image_data'")
 
     try:
-        pixel_values = await asyncio.to_thread(_decode_image, img_b64, app.state.processor)
+        img = await asyncio.to_thread(_decode_image, img_b64, app.state.processor)
     except Exception as exc:
         log.exception("Image decoding failed")
         raise HTTPException(status_code=400, detail="Invalid image data")
 
     _start_time = time.perf_counter()
     
-    pixel_values = pixel_values.to(app.state.device)
-
+    inputs = app.state.processor(images=img, return_tensors="pt")
+    inputs = {k: v.to(app.state.device) for k, v in inputs.items()}
+        
     with torch.inference_mode():        
         out = await run_in_threadpool(
-            lambda: app.state.model.get_image_features(pixel_values=pixel_values)
+            lambda: app.state.model.get_image_features(**inputs)
         )
         
     vec = _normalize(out.pooler_output.squeeze(0))

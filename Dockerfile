@@ -1,21 +1,23 @@
 # Build
-FROM python:3.14-slim-bookworm AS builder
+FROM python:3.14.4-slim-bookworm AS builder
 
-WORKDIR /build
-
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends build-essential
+
+RUN --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    --mount=type=cache,target=/root/.cache/uv \
+    /uv/bin/uv pip install --system --no-cache -r requirements.txt
 
 ARG MODEL_NAME=google/siglip2-so400m-patch16-naflex
 
-COPY ./docker_context_cache/${MODEL_NAME}/hub /app/.cache/huggingface/hub
+COPY ./.cache/${MODEL_NAME}/hub /app/.cache/huggingface/hub
 
 # Server
-FROM python:3.14-slim-bookworm
+FROM python:3.14.4-slim-bookworm
 
 RUN useradd -m siglip
 USER siglip

@@ -1,13 +1,10 @@
-# Web Framework & Server
 fastapi[standard]
 uvicorn
 
-# Machine Learning & AI
 torch
 transformers
 huggingface-hub
 
-# Processing & Utilities
 pillow
 protobuf
 sentencepiece
