@@ -106,13 +106,17 @@ INFO:     151.101.0.223:48375 - "POST /embeddings HTTP/1.1" 200 OK
 
 ## Known-knowns and other gotchas
 
+### Performance
+
+Running the `siglip_server` tool through a container incurs a noticeable performance cost, compared to running the same code locally on the host machine. This is considered to be an aceeptable, or at least known, tradeoff. The performance cost should be weighed relative to the security considerations of running code in a container environment and/or the hassle of installing dependencies locally. This will vary from situation to situation.
+
 ### Docker(file)
 
 The `builder` phase of the current [Dockerfile](Dockerfile) should be made its own image for faster building. I have not figured out the necessary command to do that _and_ maintain that image locally rather than pushing up to a third-party registry. Suggestions and pointers are welcome.
 
 ### Apple `container`
 
-First of all, the `container` is still pre-1.0 so take everything with a grain of salt. It also requires an Apple Silicon processor and works best under MacOS 26 or higher.
+First of all, [the `container` tool](https://github.com/apple/container/tree/main) is still pre-1.0 so take everything that happens with a grain of salt and some patience. It also requires an Apple Silicon processor and works best under MacOS 26 or higher.
 
 #### Networking
 
@@ -155,6 +159,7 @@ $> du -h -d 1 ~/Library/Application\ Support/com.apple.container
 Running `container prune` will often help (but you usually need to restart `container` itself before the pruning will work).
 
 ```
+$> container builder stop
 $> container prune
 buildkit
 Reclaimed 37.58 GB in disk space
