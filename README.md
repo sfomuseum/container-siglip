@@ -26,23 +26,19 @@ mkdir -p /usr/local/sfomuseum/container-siglip/.cache/google/siglip2-so400m-patc
 cp -r "/Users/example/.cache/huggingface/hub/models--google--siglip2-so400m-patch14-384" /usr/local/sfomuseum/container-siglip/.cache/google/siglip2-so400m-patch14-384/hub/
 ```
 
-_This assumes you have already fetched the model using the `hf download` tool._
+_Remember: This assumes you have already fetched the model using the `hf download` tool and that it is present in your local HuggingFace cache._
 
-## Apple `container`
+## Building
 
-### Building
+The easiest way to get started is to use the `container` or `docker` Makefile targets. The following Makefile environment variables are available for these targets:
 
-```
-$> container build --tag siglip-server --file Dockerfile .
-```
+| Name | Default | Notes |
+| --- | --- | --- |
+| MODEL | google/siglip2-so400m-patch16-naflex | The name (or "repo ID") of the model you want to build a container with. |
+| TAG | siglip-server-so400m-patch16-naflex | The tag you want to assign to the new container. |
+| NOCACHE | | Disable build caches. |
 
-### Running
-
-```
-$> container run --rm --memory 6G -p 127.0.0.1:5000:5000/tcp siglip-server
-```
-
-### Examples
+### Apple `container`
 
 ```
 $> make container MODEL=google/siglip2-so400m-patch14-384 TAG=siglip-server-so400m-patch14-384 HF_TOKEN=s33kret
@@ -58,7 +54,30 @@ container build --build-arg MODEL_NAME=google/siglip2-so400m-patch14-384 --tag s
 siglip-server-so400m-patch14-384:latest
 ```
 
-And then:
+### Docker
+
+```
+$> make docker MODEL=google/siglip2-so400m-patch14-384 TAG=siglip-server-so400m-patch14-384
+docker buildx build --debug --build-arg MODEL_NAME=google/siglip2-so400m-patch14-384 --platform=linux/amd64 --no-cache=true -f Dockerfile -t siglip-server-so400m-patch14-384 .
+
+...time passes
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/j9kf48mtwrihqphxsigvm4kd0
+```
+
+## Running
+
+The easiest way to get started is to use the `container-run` or `docker-run` Makefile targets.
+
+| Name | Default | Notes |
+| --- | --- | --- |
+| TAG | siglip-server-so400m-patch16-naflex | The name of the tag associated with the container you want to run. |
+| MEMORY | 16G | The amount of memory to assign to the container. |
+| CPUS | 8 | The number of CPUs to assign to the container. |
+| WORKERS | 1 | The number of `siglip_server` workers to start. |
+| PORT | 5000 | The local port number to forward to the container. |
+
+### Apple `container`
 
 ```
 $> make container-run TAG=siglip-server-so400m-patch14-384
@@ -71,7 +90,23 @@ INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
 INFO:     192.168.64.1:63416 - "POST /embeddings HTTP/1.1" 200 OK
 ```
 
-### Known-knowns
+### Docker
+
+```
+$> make docker-run TAG=siglip-server-so400m-patch14-384
+docker run --rm -it --platform=linux/amd64 -p 5000:5000 siglip-server-so400m-patch14-384
+Loading weights: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████|
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+INFO:     151.101.0.223:34728 - "POST /embeddings HTTP/1.1" 200 OK
+INFO:     151.101.0.223:48375 - "POST /embeddings HTTP/1.1" 200 OK
+```
+
+## Known-knowns and other gotchas
+
+### Apple `container`
 
 First of all, the `container` is still pre-1.0 so take everything with a grain of salt. It also requires an Apple Silicon processor and works best under MacOS 26 or higher.
 
@@ -121,6 +156,8 @@ buildkit
 Reclaimed 37.58 GB in disk space
 ```
 
+Note that if you run `prune` you will need to run the `docker build` or `container build` commands with the `--no-cache` flag (since you will have just deleted their cache files).
+
 #### Saving and loading images
 
 It is possible to save a container to a disk image. This can be useful when you want to produce a container on one machine and then copy it for use on another machine.
@@ -134,42 +171,3 @@ $> du -h siglip-server-so400m-patch14-384.img
 ```
 
 You would then import it using `container image save --input /path/to/image.img`.
-
-## Docker
-
-### Building
-
-```
-$> docker buildx build --debug --platform=linux/amd64 --no-cache=true -f Dockerfile -t siglip_server .
-```
-
-### Running
-
-```
-$> docker run --rm -it --memory 6G --platform=linux/amd64 -p 5000:5000 siglip_server 
-```
-
-### Examples
-
-```
-$> make docker MODEL=google/siglip2-so400m-patch14-384 TAG=siglip-server-so400m-patch14-384
-docker buildx build --debug --build-arg MODEL_NAME=google/siglip2-so400m-patch14-384 --platform=linux/amd64 --no-cache=true -f Dockerfile -t siglip-server-so400m-patch14-384 .
-
-...time passes
-
-View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/j9kf48mtwrihqphxsigvm4kd0
-```
-
-And then:
-
-```
-$> make docker-run TAG=siglip-server-so400m-patch14-384
-docker run --rm -it --platform=linux/amd64 -p 5000:5000 siglip-server-so400m-patch14-384
-Loading weights: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████|
-INFO:     Started server process [1]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
-INFO:     151.101.0.223:34728 - "POST /embeddings HTTP/1.1" 200 OK
-INFO:     151.101.0.223:48375 - "POST /embeddings HTTP/1.1" 200 OK
-```
