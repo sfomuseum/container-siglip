@@ -106,6 +106,10 @@ INFO:     151.101.0.223:48375 - "POST /embeddings HTTP/1.1" 200 OK
 
 ## Known-knowns and other gotchas
 
+### Docker(file)
+
+The `builder` phase of the current [Dockerfile](Dockerfile) should be made its own image for faster building. I have not figured out the necessary command to do that _and_ maintain that image locally rather than pushing up to a third-party registry. Suggestions and pointers are welcome.
+
 ### Apple `container`
 
 First of all, the `container` is still pre-1.0 so take everything with a grain of salt. It also requires an Apple Silicon processor and works best under MacOS 26 or higher.

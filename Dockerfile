@@ -41,4 +41,6 @@ COPY --chown=siglip:siglip bin/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 EXPOSE 5000
 
+USER siglip
+
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
