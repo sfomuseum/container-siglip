@@ -7,6 +7,9 @@ TAG=siglip-server-so400m-patch16-naflex
 
 PORT=5000
 MEMORY=6G
+CPUS=8
+
+WORKERS=1
 
 HF_CACHE := $(HOME)/.cache/huggingface/hub
 HF_TOKEN=
@@ -24,7 +27,7 @@ container:
 	container build $(if $(NOCACHE),--no-cache) --build-arg MODEL_NAME=$(MODEL) --tag $(TAG) --file Dockerfile .
 
 container-run:
-	container run --rm --memory $(MEMORY) -p 127.0.0.1:$(PORT):5000/tcp $(TAG)
+	container run --rm --memory $(MEMORY) -e WEB_CONCURRENCY=$(WORKERS) --cpus $(CPUS) -p 127.0.0.1:$(PORT):5000/tcp $(TAG) 
 
 docker:
 	docker buildx build $(if $(NOCACHE),--no-cache) --build-arg MODEL_NAME=$(MODEL) --platform=linux/amd64 -f Dockerfile -t $(TAG) .

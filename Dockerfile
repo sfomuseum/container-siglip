@@ -16,9 +16,6 @@ RUN --mount=type=bind,source=requirements.txt,target=requirements.txt \
     --mount=type=cache,target=/root/.cache/uv \
     /uv/bin/uv pip install --system -r requirements.txt
 
-# ARG MODEL_NAME=google/siglip2-so400m-patch16-naflex
-# COPY ./.cache/${MODEL_NAME}/hub /app/.cache/huggingface/hub
-
 # Server
 FROM python:3.14.4-slim-bookworm
 
@@ -38,9 +35,8 @@ ENV MODEL_NAME=${MODEL_NAME} \
 COPY --from=builder /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --chown=siglip:siglip ./.cache/${MODEL_NAME}/hub /home/siglip/app/.cache/huggingface/hub
-# COPY --from=builder --chown=siglip:siglip /app/.cache /home/siglip/app/.cache
 
-COPY bin/siglip_server.py /usr/local/bin
+COPY bin/siglip_server /usr/local/bin/siglip_server
 COPY --chown=siglip:siglip bin/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 EXPOSE 5000

@@ -125,4 +125,6 @@ async def embeddings_image(payload: dict = Body(...)):
     return {"embeddings": vec.tolist(), "model": _args.model_name}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=_args.host, port=_args.port, loop="uvloop")
+    # Set "main:app" and not just app so that we can specify the number of workers
+    # using the WEB_CONCURRENCY=(n) environment variable
+    uvicorn.run("main:app", host=_args.host, port=_args.port, loop="uvloop")
