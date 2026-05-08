@@ -139,24 +139,24 @@ $> container builder start --memory 16g --cpus 8
 
 #### Disk space
 
-The `container` framework uses a lot of disk space. It's not clear why but data is stored in `~/Library/Application\ Support/com.apple.container`.
+The `container` framework uses a lot of disk space. That data is stored in `~/Library/Application\ Support/com.apple.container`.
 
 ```
 $> du -h -d 1 ~/Library/Application\ Support/com.apple.container
-  0B	/Users/asc/Library/Application Support/com.apple.container/.build
- 29M	/Users/asc/Library/Application Support/com.apple.container/kernels
-9.7G	/Users/asc/Library/Application Support/com.apple.container/snapshots
-6.9G	/Users/asc/Library/Application Support/com.apple.container/content
-8.0K	/Users/asc/Library/Application Support/com.apple.container/networks
-4.0K	/Users/asc/Library/Application Support/com.apple.container/apiserver
- 35G	/Users/asc/Library/Application Support/com.apple.container/containers
-  0B	/Users/asc/Library/Application Support/com.apple.container/volumes
-4.0K	/Users/asc/Library/Application Support/com.apple.container/plugin-state
-  0B	/Users/asc/Library/Application Support/com.apple.container/builder
- 52G	/Users/asc/Library/Application Support/com.apple.container
+  0B	/Users/example/Library/Application Support/com.apple.container/.build
+ 29M	/Users/example/Library/Application Support/com.apple.container/kernels
+9.7G	/Users/example/Library/Application Support/com.apple.container/snapshots
+6.9G	/Users/example/Library/Application Support/com.apple.container/content
+8.0K	/Users/example/Library/Application Support/com.apple.container/networks
+4.0K	/Users/example/Library/Application Support/com.apple.container/apiserver
+ 35G	/Users/example/Library/Application Support/com.apple.container/containers
+  0B	/Users/example/Library/Application Support/com.apple.container/volumes
+4.0K	/Users/example/Library/Application Support/com.apple.container/plugin-state
+  0B	/Users/example/Library/Application Support/com.apple.container/builder
+ 52G	/Users/example/Library/Application Support/com.apple.container
 ```
 
-Running `container prune` will often help (but you usually need to restart `container` itself before the pruning will work).
+Running `container prune` will often help. For example:
 
 ```
 $> container builder stop
