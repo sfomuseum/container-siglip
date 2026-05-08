@@ -2,11 +2,11 @@
 
 ## Motivation
 
-This package is little more than a Dockerfile and some tools to run inside the container it produces. The container itself is a simple Python FastAPI HTTP server to generate vector embeddings (text and image) using one of Google' SigLIP2 models. The specific model is bundled with the container itself when it is built and the server tool is configured, by default, to only use that local data.
+This package is little more than a Dockerfile and some tools to run inside the container it produces. The container itself is a simple Python FastAPI HTTP server to generate vector embeddings (text and image) using one of Google's [SigLIP2](https://huggingface.co/blog/siglip2) models. The specific model is bundled with the container itself when it is built and the server tool is configured, by default, to only use that local data.
 
 These tools have been demonstrated to work with both [Docker](https://docker.com/) and Apple's [container](https://github.com/apple/container/) framework. The goal is to produce a standalone artifact (application) which can be used to generate embeddings without having to install a bunch of additional software.
 
-While at least one of the two `docker` or `container` applications are still required they are both available with package installers from (presumably) trusted sources. It's not quite one-click or plug-and-play but it does meaningfull reduce the steps required to set up the tooling necessary to create vector embeddings.
+While at least one of the two `docker` or `container` applications are still required they are both available with package installers from (presumably) trusted sources. It's not quite one-click or plug-and-play but it does meaningfully reduce the steps required to set up the tooling necessary to create vector embeddings.
 
 ## Models
 
@@ -50,8 +50,11 @@ container build --build-arg MODEL_NAME=google/siglip2-so400m-patch14-384 --tag s
 
 ...time passes
 
- => => exporting manifest list sha256:4d9f6c5aab770f8f49739440b54806d02982346b5bbd413ea0574a87fc4ab469                                                                                                                        0.0s
- => => sending tarball                                                                                                                                                                                                       58.1s
+=> exporting manifest list sha256:4d9f6c5aab770f8f49739440b54806d02982346b5bbd413ea0574a87fc4ab469
+0.0s
+=> sending tarball
+58.1s
+
 siglip-server-so400m-patch14-384:latest
 ```
 

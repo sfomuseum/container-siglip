@@ -63,7 +63,7 @@ async def lifespan(app: FastAPI):
     log.info("Model loaded")
 
     app.state.processor = processor
-    app.state.model = model
+    app.state.model = compiled
     app.state.device = device
     
     yield
@@ -80,7 +80,7 @@ async def embeddings(payload: dict = Body(...)):
 
     _start_time = time.perf_counter()
     
-    with torch.inference_mode():
+    with torch.no_grad():
         out = await run_in_threadpool(
             lambda: app.state.model.get_text_features(**inputs)
         )
@@ -112,7 +112,7 @@ async def embeddings_image(payload: dict = Body(...)):
     inputs = app.state.processor(images=img, return_tensors="pt")
     inputs = {k: v.to(app.state.device) for k, v in inputs.items()}
         
-    with torch.inference_mode():        
+    with torch.no_grad():        
         out = await run_in_threadpool(
             lambda: app.state.model.get_image_features(**inputs)
         )
