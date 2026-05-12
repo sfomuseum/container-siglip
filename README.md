@@ -15,7 +15,7 @@ This container has been tested with the following models:
 * google/siglip2-so400m-patch14-384
 * google/siglip2-so400m-patch16-naflex
 
-### Preparing "model context"
+## Building
 
 Rather than fetching any given model from scratch every time a container is built this package assumes that there is a local copy of that model, copied from your local HuggingFace cache, in the `.cache` folder. The easiest way to configure this is to use the `prep-model-context` Makefile target with model (or "repo ID"). The Makefile target will take of ensuring the correct path and naming conventions. For example:
 
@@ -28,9 +28,7 @@ cp -r "/Users/example/.cache/huggingface/hub/models--google--siglip2-so400m-patc
 
 _Remember: This assumes you have already fetched the model using the `hf download` tool and that it is present in your local HuggingFace cache._
 
-## Building
-
-The easiest way to get started is to use the `container` or `docker` Makefile targets. The following Makefile environment variables are available for these targets:
+Once you have a locally cached model the easiest way to get started is to use the `container` or `docker` Makefile targets. The following Makefile environment variables are available for these targets:
 
 | Name | Default | Notes |
 | --- | --- | --- |
@@ -104,11 +102,13 @@ INFO:     151.101.0.223:34728 - "POST /embeddings HTTP/1.1" 200 OK
 INFO:     151.101.0.223:48375 - "POST /embeddings HTTP/1.1" 200 OK
 ```
 
+## Endpoints
+
+### /embeddings
+
+### /embeddings/image
+
 ## Known-knowns and other gotchas
-
-### Performance
-
-Running the `siglip_server` tool through a container incurs a noticeable performance cost, compared to running the same code locally on the host machine. This is considered to be an aceeptable, or at least known, tradeoff. The performance cost should be weighed relative to the security considerations of running code in a container environment and/or the hassle of installing dependencies locally. This will vary from situation to situation.
 
 ### Docker(file)
 
@@ -117,6 +117,10 @@ The `builder` phase of the current [Dockerfile](Dockerfile) should be made its o
 ### Apple `container`
 
 First of all, [the `container` tool](https://github.com/apple/container/tree/main) is still pre-1.0 so take everything that happens with a grain of salt and some patience. It also requires an Apple Silicon processor and works best under MacOS 26 or higher.
+
+#### Performance
+
+Running the `siglip_server` tool through the Apple `container` framework incurs a noticeable performance cost, compared to running the same code locally on the host machine. This is considered to be an aceeptable, or at least known, tradeoff. The performance cost should be weighed relative to the security considerations of running code in a container environment and/or the hassle of installing dependencies locally. This will vary from situation to situation.
 
 #### Networking
 
