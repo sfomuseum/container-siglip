@@ -110,6 +110,8 @@ INFO:     151.101.0.223:48375 - "POST /embeddings HTTP/1.1" 200 OK
 
 Running the `siglip_server` tool through a container incurs a noticeable performance cost, compared to running the same code locally on the host machine. This is considered to be an aceeptable, or at least known, tradeoff. The performance cost should be weighed relative to the security considerations of running code in a container environment and/or the hassle of installing dependencies locally. This will vary from situation to situation.
 
+Anecdotally increasing the number of CPUs (with the `--cpus` flag) has more effect than simply increasing RAM (with the `--memory` flag).
+
 ### Docker(file)
 
 The `builder` phase of the current [Dockerfile](Dockerfile) should be made its own image for faster building. I have not figured out the necessary command to do that _and_ maintain that image locally rather than pushing up to a third-party registry. Suggestions and pointers are welcome.
