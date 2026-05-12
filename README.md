@@ -34,6 +34,7 @@ Once you have a locally cached model the easiest way to get started is to use th
 | --- | --- | --- |
 | MODEL | google/siglip2-so400m-patch16-naflex | The name (or "repo ID") of the model you want to build a container with. |
 | TAG | siglip-server-so400m-patch16-naflex | The tag you want to assign to the new container. |
+| USE_LWA | false | Include the [AWS Linux Web Adapter](https://aws.github.io/aws-lambda-web-adapter/getting-started/docker-images.html) layers. This is necessary if you want to run a Lambda Function URL on top of a Lambda function configured from a container image. See [AWS notes](#aws) below. |
 | NOCACHE | | Disable build caches. |
 
 ### Apple `container`
@@ -245,3 +246,23 @@ $> du -h siglip-server-so400m-patch14-384.img
 ```
 
 You would then import it using `container image save --input /path/to/image.img`. This can be very useful when you want to build images on one host and then transfer them to another without having to rebuild everything from scratch.
+
+### AWS
+
+#### FROM public.ecr.aws/awsguru/aws-lambda-adapter:1.0.0 AS lwa_base
+
+This just gets pulled in regardless of whether you need to want to use the Lambda Web Adapter. If there's a way to make this a conditional, without having to make separate Dockerfiles, I'd love to hear about it.
+
+#### Lambda
+
+It is technically _possible_ to run the `google/siglip2-so400m-patch16-naflex` container from a Lambda function configured with a Lambda Function URL. The `google/siglip2-so400m-patch14-384` container will NOT run as its size exceeds the limits imposed by the Lambda service. You will need to make sure you pass the `USE_LWA` build flag when creating your container. For example:
+
+```
+$> make docker USE_LWA=true
+```
+
+Details of adding the container to your AWS ECS repository are outside the scope of this document.
+
+You will also need to configure your Lambda function to have at least 8G of RAM (you could probably get away with 6G). You will also need to set a high timeout value (3+ minutes) and be patient the first time you invoke it. It will take a long time. As such it's probably not anything you want to deploy in production.
+
+On the other hand once the Lambda function is "warm" (in memory) it is actually pretty responsive. Not blazingly fast but probably fast enough for a batch-processing job that will run in the background.

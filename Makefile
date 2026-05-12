@@ -4,6 +4,7 @@ NOCACHE=
 
 MODEL=google/siglip2-so400m-patch16-naflex
 TAG=siglip-server-so400m-patch16-naflex
+USE_LWA=false
 
 PORT=5000
 MEMORY=6G
@@ -30,7 +31,7 @@ container-run:
 	container run --rm --memory $(MEMORY) -e WEB_CONCURRENCY=$(WORKERS) --cpus $(CPUS) -p 127.0.0.1:$(PORT):5000/tcp $(TAG) 
 
 docker:
-	docker buildx build $(if $(NOCACHE),--no-cache) --build-arg MODEL_NAME=$(MODEL) --platform=linux/amd64 -f Dockerfile -t $(TAG) .
+	docker buildx build $(if $(NOCACHE),--no-cache) --build-arg MODEL_NAME=$(MODEL) --build-arg USE_LWA=$(USE_LWA) --platform=linux/amd64 -f Dockerfile -t $(TAG) .
 
 docker-run:
 	docker run --rm -it --memory $(MEMORY) --platform=linux/amd64 -p $(PORT):5000 $(TAG)
