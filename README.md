@@ -104,9 +104,64 @@ INFO:     151.101.0.223:48375 - "POST /embeddings HTTP/1.1" 200 OK
 
 ## Endpoints
 
-### /embeddings
+The resulting container spins up a simple FastAPI server on port 5000 (default) with the following endpoints:
 
-### /embeddings/image
+### POST /embeddings
+
+Generate a text embedding.
+
+#### Request
+
+```
+{
+  "content": "Your text string here."
+}
+```
+
+* `content` – string (required) – The text to embed.
+
+#### Response
+
+```
+{
+  "embeddings": [0.123, -0.456, ...],   // L2‑normalized vector
+  "model": "google/siglip2-so400m-patch16-naflex"
+}
+```
+
+* `embeddings` – array of L2‑normalized embedding vectors (list of floats).
+* `model` – string – The model identifier used.
+
+### POST /embeddings/image
+
+Generate an image embedding.
+
+#### Request
+
+```
+{
+  "image_data": [
+    {
+      "data": "base64-encoded-image-string"
+    }
+  ]
+}
+```
+
+* `image_data` – array (must contain at least one element) – Each element may contain additional fields; only the first element’s data field is read.
+* `data` – string – base64 representation of the image (PNG, JPEG, etc.). The image is decoded, converted to RGB, and processed by the model.
+
+#### Response
+
+```
+{
+  "embeddings": [0.987, -0.321, ...],
+  "model": "google/siglip2-so400m-patch16-naflex"
+}
+```
+
+* `embeddings` – array of L2‑normalized embedding vectors (list of floats).
+* `model` – string – The model identifier used.
 
 ## Known-knowns and other gotchas
 
