@@ -122,6 +122,8 @@ First of all, [the `container` tool](https://github.com/apple/container/tree/mai
 
 Running the `siglip_server` tool through the Apple `container` framework incurs a noticeable performance cost, compared to running the same code locally on the host machine. This is considered to be an aceeptable, or at least known, tradeoff. The performance cost should be weighed relative to the security considerations of running code in a container environment and/or the hassle of installing dependencies locally. This will vary from situation to situation.
 
+Anecdotally increasing the number of CPUs (with the `--cpus` flag and/or the `-e WEB_CONCURRENCY=(NUMBER_OF_FASTAPI_WORKERS)` flag) has more effect than simply increasing RAM (with the `--memory` flag).
+
 #### Networking
 
 Sometimes, the internal networking layer gets messed up up. The easiest thing is to simply restart `container`:
@@ -133,9 +135,13 @@ $> container system start
 
 _Honestly, at this stage, restarting `container` is pretty much the easiest solution to most problems you might encounter._
 
+#### Running as a "headless" service
+
+Basically, you can't yet. That's because the `container system start` needs to be able to write to `~/Library/Application Support/com.apple.container/` which won't be present if you are trying to run things with a "system"-level user (that doesn't have a traditional GUI login). There is an [open ticket](https://github.com/apple/container/issues/1514) related to these issues but, as of this writing, there is no ETA on a resolution.
+
 #### Resource exhaustion
 
-For larger models (like SigLIP) you may need to start the `container builder` process with explicit memory settings to prevent resource extraction.
+For larger models (like SigLIP) you may need to start the `container builder` process with explicit memory settings to prevent resource exhaustion.
 
 ```
 $> container builder start --memory 16g --cpus 8
@@ -183,4 +189,4 @@ $> du -h siglip-server-so400m-patch14-384.img
 6.8G	siglip-server-so400m-patch14-384.img
 ```
 
-You would then import it using `container image save --input /path/to/image.img`.
+You would then import it using `container image save --input /path/to/image.img`. This can be very useful when you want to build images on one host and then transfer them to another without having to rebuild everything from scratch.
