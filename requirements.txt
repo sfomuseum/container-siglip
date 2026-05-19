@@ -1,7 +1,9 @@
 fastapi[standard]
 uvicorn
+uvloop
 
 torch
+torchvision
 transformers
 huggingface-hub
 
