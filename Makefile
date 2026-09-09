@@ -30,6 +30,9 @@ container:
 container-run:
 	container run --rm --memory $(MEMORY) -e WEB_CONCURRENCY=$(WORKERS) --cpus $(CPUS) -p 127.0.0.1:$(PORT):5000/tcp $(TAG) 
 
+lambda:
+	@make docker USE_LWA=true
+
 docker:
 	docker buildx build $(if $(NOCACHE),--no-cache) --build-arg MODEL_NAME=$(MODEL) --build-arg USE_LWA=$(USE_LWA) --platform=linux/amd64 -f Dockerfile -t $(TAG) .
 
